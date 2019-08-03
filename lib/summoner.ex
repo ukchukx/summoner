@@ -21,7 +21,11 @@ defmodule Summoner do
               |> Enum.flat_map(&Task.await(&1, 10_000))
               |> Enum.filter(&is_map/1)
 
-            [%{account_id => %{info: summoner_info(summoner), matches: matches}} | player_infos]
+            player_infos = [%{account_id => %{info: summoner_info(summoner), matches: matches}} | player_infos]
+
+            GenServer.cast(Summoner.PlayerServer, {:load, player_infos})
+
+            player_infos
 
           {:error, _} -> "Could not get matches"
         end
